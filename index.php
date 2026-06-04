@@ -1,14 +1,17 @@
 <?php
-// AGS LMS - نسخه 1.3
-$version = "1.3";
+// AGS LMS - نسخه 1.4
+$version = "1.4";
 
 echo "<h1>📚 AGS Learning Management System</h1>";
 echo "<p>نسخه فعلی: <strong>{$version}</strong></p>";
 echo "<hr>";
-echo "<h3>✅ ویژگی‌های نسخه 1.3:</h3>";
+echo "<h3>✅ ویژگی‌های نسخه 1.4:</h3>";
 echo "<ul>";
 echo "<li>مدیریت کاربران پایه</li>";
 echo "<li>سیستم نمره‌دهی ساده</li>";
 echo "<li>پنل مدیریت ابتدایی</li>";
+echo "<li style='color:green;'>✨ ماژول نمره‌دهی پیشرفته (جدید!)</li>";
+echo "<li style='color:green;'>✨ سیستم آپدیت خودکار (جدید!)</li>";
+echo "<li style='color:green;'>✨ گزارش‌گیری پیشرفته (جدید!)</li>";
 echo "</ul>";
 ?>

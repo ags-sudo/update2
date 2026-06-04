@@ -1,0 +1,214 @@
+# ============================================
+# تنظیمات اصلی سایت - آکادمی ME MATH
+# ============================================
+
+# فعال کردن موتور بازنویسی
+RewriteEngine On
+
+# ============================================
+# تنظیم صفحه اصلی (index.html و index.php)
+# ============================================
+
+# هدایت دامنه به index.html در صورت وجود
+DirectoryIndex index2.php index.php index.htm
+
+# بازنویسی برای حذف پسوند .php (اختیاری)
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+# ============================================
+# رفع خطای 412 (Precondition Failed)
+# ============================================
+
+ErrorDocument 404 /404.shtml
+
+ErrorDocument 403 /403.shtml
+
+
+# غیرفعال کردن SecFilterEngine (برای رفع خطای 412)
+SecFilterEngine Off
+SecFilterScanPOST Off
+
+# غیرفعال کردن mod_security برای مسیرهای خاص (در صورت دسترسی)
+<IfModule mod_security.c>
+    SecFilterEngine Off
+    SecFilterScanPOST Off
+</IfModule>
+
+# تنظیمات هدرها برای جلوگیری از خطای 412
+<IfModule mod_headers.c>
+    Header unset If-Match
+    Header unset If-None-Match
+    Header unset If-Modified-Since
+    Header unset If-Unmodified-Since
+    Header set Cache-Control "no-cache, must-revalidate"
+</IfModule>
+
+# ============================================
+# فشرده سازی (Gzip/Brotli) برای سرعت بالا
+# ============================================
+
+# Brotli فشرده‌سازی (بهتر از Gzip)
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml application/rss+xml image/svg+xml font/ttf font/otf
+</IfModule>
+
+# Gzip فشرده‌سازی (پشتیبان)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml application/rss+xml image/svg+xml
+    AddOutputFilterByType DEFLATE application/x-httpd-php
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+</IfModule>
+
+# ============================================
+= کش مرورگر (Browser Cache) برای سرعت ۲۰ برابر
+# ============================================
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # تصاویر - 1 سال
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/ico "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # فونت‌ها - 1 سال
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    
+    # CSS و JS - 1 ماه
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    
+    # HTML و PHP - 0 (بدون کش)
+    ExpiresByType text/html "access plus 0 seconds"
+    ExpiresByType application/xhtml+xml "access plus 0 seconds"
+</IfModule>
+
+# ============================================
+# هدرهای کش (Cache Headers)
+# ============================================
+
+<IfModule mod_headers.c>
+    # کش برای فایل‌های استاتیک
+    <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|webp|js|css|swf|woff|woff2|ttf|otf|svg)$">
+        Header set Cache-Control "max-age=31536000, public, immutable"
+    </FilesMatch>
+    
+    # عدم کش برای فایل‌های داینامیک
+    <FilesMatch "\.(html|php|cgi|pl)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+</IfModule>
+
+# ============================================
+# امنیت - جلوگیری از دسترسی به فایل‌های حساس
+# ============================================
+
+# جلوگیری از دسترسی به فایل‌های config و htaccess
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "(config\.php|\.htaccess|\.htpasswd|\.ini|\.log|\.sql|\.bak)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# جلوگیری از نمایش لیست فایل‌ها در دایرکتوری
+Options -Indexes
+
+# ============================================
+# مسیریابی خطاها (Error Pages)
+# ============================================
+
+ErrorDocument 400 /error/400.html
+ErrorDocument 401 /error/401.html
+ErrorDocument 403 403.shtml
+ErrorDocument 404 404.shtml
+ErrorDocument 412 /error/412.html
+ErrorDocument 500 /error/500.html
+
+# ============================================
+# هدایت HTTP به HTTPS (در صورت داشتن SSL)
+# ============================================
+
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# ============================================
+# حذف www از آدرس (بهبود SEO)
+# ============================================
+
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+# ============================================
+= حذف trailing slash (اختیاری)
+# ============================================
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+# ============================================
+# امنیت - جلوگیری از SQL Injection و XSS
+# ============================================
+
+<IfModule mod_rewrite.c>
+    # جلوگیری از SQL Injection
+    RewriteCond %{QUERY_STRING} (;|<|>|'|"|\)|%0A|%0D|%22|%27|%3C|%3E|%00).*(/\*|union|select|insert|drop|delete|update|create|alter|replace) [NC,OR]
+    RewriteCond %{QUERY_STRING} (/\*|union|select|insert|drop|delete|update|create|alter|replace).*(;|<|>|'|"|\)|%0A|%0D|%22|%27|%3C|%3E|%00) [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# ============================================
+# تنظیمات charset و زبان
+# ============================================
+
+AddDefaultCharset UTF-8
+DefaultLanguage fa-IR
+
+# ============================================
+# افزایش حافظه و زمان اجرا برای PHP
+# ============================================
+
+<IfModule mod_php7.c>
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+    php_value upload_max_filesize 64M
+    php_value post_max_size 64M
+    php_value max_input_time 300
+</IfModule>
+
+# ============================================
+# مسدود کردن IP های مزاحم (در صورت نیاز)
+# ============================================
+
+# Deny from 192.168.1.1
+# Deny from 10.0.0.0/8
+
+# ============================================
+# تنظیمات CORS (در صورت نیاز به API)
+# ============================================
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+</IfModule>
